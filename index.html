@@ -46,6 +46,24 @@
   .view.active { display: block; }
   .lv { border-left: 4px solid #f2b8c1; padding: 6px 10px; margin: 10px 0; background: #fffaf9; border-radius: 6px; }
   .lv.now { border-left-color: #e56b81; background: #fdf0f0; }
+  .lvbar-wrap { background: #f7e3e6; border-radius: 999px; height: 14px; overflow: hidden; margin: 8px 0 4px; }
+  .lvbar { background: linear-gradient(90deg, #f2b8c1, #e56b81); height: 100%; border-radius: 999px; transition: width .4s; }
+  .teller-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .teller-btn { height: auto; padding: 12px 6px; line-height: 1.5; white-space: normal; }
+  .teller-emoji { font-size: 34px; display: block; }
+  .tcard { width: 88px; height: 132px; perspective: 600px; display: inline-block; margin: 4px; cursor: pointer; vertical-align: top; }
+  .tcard-inner { position: relative; width: 100%; height: 100%; transition: transform .6s; transform-style: preserve-3d; }
+  .tcard.flipped .tcard-inner { transform: rotateY(180deg); }
+  .tcard-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; text-align: center; box-sizing: border-box; }
+  .tcard-back { background: linear-gradient(135deg, #8e6cc8, #e56b9c); color: #fff; font-size: 32px; }
+  .tcard-front { background: #fff8fa; border: 2px solid #e56b9c; transform: rotateY(180deg); font-size: 12px; line-height: 1.4; }
+  .petals { font-size: 26px; letter-spacing: 2px; line-height: 1.5; word-break: break-all; }
+  .lvbadge { font-size: 11px; background: #e56b81; color: #fff; border-radius: 999px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+  .lvbadge.done { background: #b9d6a5; color: #40632c; }
+  .lvdots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 8px 0 4px; }
+  .lvdots .dot { text-align: center; font-size: 15px; line-height: 1.5; border-radius: 8px; background: #fffaf9; padding: 3px 0; }
+  .lvdots .dot.off { color: #e8ccd1; }
+  .lvdots .dot.today { outline: 2px solid #e56b81; }
   .hist { display: flex; gap: 6px; margin-top: 8px; }
   .hist span { width: 30px; height: 30px; border-radius: 50%; background: #f3e3e1; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #9a7d80; }
   .hist span.y { background: #e56b81; color: #fff; }
@@ -239,10 +257,16 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
       <p class="text" id="lvNow"></p>
       <p class="muted" id="lvProg"></p>
       <p class="muted" id="lvExtra"></p>
-      <div class="lv" id="lvBox1"><h3>Lv1 見た目・習慣</h3><p class="muted">笑顔、姿勢、服装のワンポイント、感謝の言葉。まずは「近づきやすい人」になります。</p></div>
-      <div class="lv" id="lvBox2"><h3>Lv2 何気ない会話</h3><p class="muted">挨拶＋一言、相づちと質問、変化に気づく。小さな会話を積み重ねます。</p></div>
-      <div class="lv" id="lvBox3"><h3>Lv3 自分からの行動</h3><p class="muted">声かけ、LINE、軽い誘い。断られた時の返しまで含めて練習します。</p></div>
-      <p class="muted">ふりかえりで「できた」を積み重ねるとレベルが上がります（試作仕様: 達成7日でLv2、21日でLv3）。</p>
+      <p class="text">積み上げポイント: <span class="big" id="lvPoints">0</span> pt</p>
+      <div class="lvbar-wrap"><div class="lvbar" id="lvBar" style="width:0%"></div></div>
+      <p class="muted" id="lvNext"></p>
+      <div class="lv" id="lvBox1"><h3>Lv1 見た目・習慣<span class="lvbadge" id="lvBadge1" style="display:none"></span></h3><p class="muted">笑顔、姿勢、服装のワンポイント、感謝の言葉。まずは「近づきやすい人」になります。</p></div>
+      <div class="lv" id="lvBox2"><h3>Lv2 何気ない会話<span class="lvbadge" id="lvBadge2" style="display:none"></span></h3><p class="muted">挨拶＋一言、相づちと質問、変化に気づく。小さな会話を積み重ねます。</p></div>
+      <div class="lv" id="lvBox3"><h3>Lv3 自分からの行動<span class="lvbadge" id="lvBadge3" style="display:none"></span></h3><p class="muted">声かけ、LINE、軽い誘い。断られた時の返しまで含めて練習します。</p></div>
+      <p class="muted">ふりかえりで「できた」を積み重ねるとレベルが上がります（達成7日でLv2、21日でLv3に上がります）。ポイントは、ふりかえりで記録した日数×10ptです（会えなかった「準備日」も前進として数えます）。</p>
+      <h3>直近4週間の積み上げ</h3>
+      <div class="lvdots" id="lvDots"></div>
+      <p class="muted">💗 できた日 ／ 💛 準備日（会えなかった日） ／ ・ お休み・未記録（枠がついているのが今日）</p>
     </div>
   </section>
 
@@ -308,6 +332,34 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
 
   <!-- 診断 -->
   <section id="view-diagnosis" class="view">
+    <div class="card">
+      <h2>体験占い</h2>
+      <p class="small">占い師に、実際に占ってもらうコーナーです。結果は、その日の小さな一歩のヒントにしてください。</p>
+      <div id="tellerPick"></div>
+      <div id="tellerNow"></div>
+    </div>
+    <div class="card">
+      <h2>タロット占い（3枚引き）</h2>
+      <p class="small">心の中で質問を思い浮かべてから引いてください。カードをタップすると、1枚ずつめくれます（今の状況／気をつけること／アドバイス）。</p>
+      <button class="primary" onclick="drawTarot()">カードを引く</button>
+      <div id="tarotStage" style="margin-top:10px"></div>
+      <div id="tarotResult"></div>
+      <p class="small" id="tarotNote"></p>
+    </div>
+    <div class="card">
+      <h2>おみくじ</h2>
+      <p class="small">今日の恋愛運を、おみくじでどうぞ。</p>
+      <button class="primary" onclick="drawOmikuji()">おみくじを引く</button>
+      <div id="omikujiResult" style="margin-top:10px"></div>
+      <p class="small" id="omikujiNote"></p>
+    </div>
+    <div class="card">
+      <h2>花占い</h2>
+      <p class="small">気になる人を思い浮かべて、花びらを1枚ずつ取っていきます。最後の1枚が答えです。</p>
+      <button class="primary" onclick="startFlower()">花占いを始める</button>
+      <div id="flowerStage" style="margin-top:10px"></div>
+      <p class="small" id="flowerNote"></p>
+    </div>
     <div class="card">
       <h2>脈あり診断</h2>
       <p class="small">気になる相手の様子に当てはまるものを選んでください。％は目安のエンターテインメントで、相手の気持ちを断定するものではありません。結果は端末の中だけに残ります。</p>
@@ -394,6 +446,37 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
       <p class="text" id="costTotal"></p>
       <div id="costList"></div>
     </div>
+    <div class="card">
+      <h2>お金の記録（見える化）</h2>
+      <p class="small">収入と支出を残して、無駄を見つける場所です。かんたんモードでは支出の記録と今月の合計だけ、しっかりモードでは収入・残り・カテゴリ別グラフ・無駄アドバイスまで見られます。</p>
+      <p class="small">🛡 収入・支出の記録は、すべてこの端末の中だけに保存されます。外部のサーバーへ送信されることはなく、第三者が閲覧することは一切ありません。</p>
+      <p class="small">現在のモード: <span id="mnModeName">かんたん</span>（設定でも切り替えられます）</p>
+      <div class="row"><button class="ghost" onclick="setMoneyMode('simple')">かんたん</button><button class="ghost" onclick="setMoneyMode('full')">しっかり</button></div>
+      <div id="mnIncomeBox">
+        <label>今月の収入（手取り・円）</label>
+        <input type="number" id="mnIncome" min="0" placeholder="例: 230000">
+        <button class="primary" onclick="saveIncome()">収入を保存</button>
+      </div>
+      <label>支出の金額（円）</label>
+      <input type="number" id="mnAmount" min="0" placeholder="例: 1200">
+      <label>カテゴリ</label>
+      <select id="mnCat">
+        <option value="食費">食費</option>
+        <option value="日用品">日用品</option>
+        <option value="交通">交通</option>
+        <option value="固定費">固定費</option>
+        <option value="交際・デート">交際・デート</option>
+        <option value="自分磨き">自分磨き</option>
+        <option value="趣味・娯楽">趣味・娯楽</option>
+        <option value="その他">その他</option>
+      </select>
+      <label>メモ（任意）</label>
+      <input type="text" id="mnMemo" placeholder="例: コンビニ">
+      <button class="primary" onclick="addMoney()">支出を記録する</button>
+      <p class="text" id="mnSummary"></p>
+      <div id="mnDetail"></div>
+      <div id="mnList"></div>
+    </div>
   </section>
 
   <!-- 設定 -->
@@ -425,7 +508,28 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
     <div class="card">
       <h2>プライバシー</h2>
       <p class="text">🛡 入力した情報は、第三者が閲覧することは一切ありません。</p>
-      <p class="muted">生年月日・よく行く場所・気になる相手のこと・日々の記録は、すべてこの端末の中だけに保存されます。外部のサーバーへ送信されることはありません。安心して、正直に入力してください。情報が具体的であるほど、あなたに合ったアドバイスになります。</p>
+      <p class="muted">生年月日・よく行く場所・気になる相手のこと・日々の記録・お金の記録（収入と支出）は、すべてこの端末の中だけに保存されます。外部のサーバーへ送信されることはありません。安心して、正直に入力してください。情報が具体的であるほど、あなたに合ったアドバイスになります。</p>
+    </div>
+    <div class="card">
+      <h2>お金の記録モード</h2>
+      <p class="small">お金の記録（見える化）の使い方を選べます。切り替えても、これまでの記録は消えません。収入・支出の記録は、この端末の中だけに保存され、第三者が閲覧することは一切ありません。</p>
+      <label>モード</label>
+      <select id="inMoneyMode" onchange="saveMoneyMode()">
+        <option value="simple">かんたん（支出の記録と今月の合計）</option>
+        <option value="full">しっかり（収入・残り・グラフ・無駄アドバイス）</option>
+      </select>
+    </div>
+    <div class="card">
+      <h2>占い師</h2>
+      <p class="small">体験占いを担当する占い師です。ここでいつでも変更できます。</p>
+      <label>占い師</label>
+      <select id="inTeller" onchange="changeTeller()">
+        <option value="">選んでください</option>
+        <option value="cat">🐱 ねこのミル（ほんわか癒し系）</option>
+        <option value="owl">🦉 フクロウのホー先生（知的でクール）</option>
+        <option value="fox">🦊 きつねのコンコン（神秘的で大人）</option>
+        <option value="rabbit">🐰 うさぎのピョン（元気いっぱい）</option>
+      </select>
     </div>
     <div class="card">
       <h2>プロフィール</h2>
@@ -515,7 +619,7 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
       <div id="subArea"></div>
       <h3>無料とプレミアムの違い</h3>
       <p class="text">無料: 今日の恋愛運と占い4種／ミッションと追加チャレンジ（1日1回まで）／基本テクニック／脈あり診断（月3回まで）／ふりかえりと記録</p>
-      <p class="text">プレミアム（月額980円・税込、1プランだけ）: 追加チャレンジ無制限／上級テクニック／生活に合わせたテクニック／脈あり診断 無制限／相性診断の詳細レポート／週次レポート／場所・趣味に合わせたカスタマイズ</p>
+      <p class="text">プレミアム（月額980円・税込、1プランだけ）: 追加チャレンジ無制限／上級テクニック／生活に合わせたテクニック／脈あり診断 無制限／相性診断の詳細レポート／週次レポート／場所・趣味に合わせたカスタマイズ／お金の見える化（カテゴリ別グラフ・無駄アドバイス）／体験占いの引き直し</p>
       <p class="muted">文字課金・ポイント課金はありません。解約はいつでもこの画面からでき、解約しても期間の終わりまで使えます。</p>
     </div>
     <div class="card">
@@ -2961,7 +3065,10 @@ if (!state.profile) { state.profile = { birth: "1995-04-12", home: "東京都新
 if (state.brakeOn === undefined) state.brakeOn = false;
 if (state.premium === undefined) state.premium = false;
 if (state.profileSet === undefined) state.profileSet = false;
+/* Phase 18: 旧バージョン等で登録済みフラグが無いまま実際のプロフィールが保存されている場合は、登録済みとして扱いホームの登録カードを出さない */
+if (!state.profileSet && state.profile && (state.profile.birth !== "1995-04-12" || state.profile.home !== "東京都新宿区" || state.profile.work !== "東京都千代田区")) { state.profileSet = true; persist(); }
 if (state.extraTotal === undefined) state.extraTotal = 0;
+if (state.teller === undefined) state.teller = null;
 function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {} }
 function nowJ() { return new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" })); }
 function todayKey() { var d = nowJ(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
@@ -3069,7 +3176,7 @@ function saveProfile() {
 function resetAll() {
   if (!confirm("記録をすべて消しますか？")) return;
   state = { profile: { birth: "1995-04-12", home: "東京都新宿区", work: "東京都千代田区" }, done: {}, brakeOn: false, premium: false, profileSet: false, extraTotal: 0 };
-  try { ["aikyoUrgeV1", "aikyoContactV1", "aikyoDraftV1", "aikyoRequestsV1", "aikyoSeedVotesV1", "aikyoMyakuV1", "aikyoCostsV1", "aikyoSubV1", "aikyoAbsenceV1", "aikyoSceneV1"].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  try { ["aikyoUrgeV1", "aikyoContactV1", "aikyoDraftV1", "aikyoRequestsV1", "aikyoSeedVotesV1", "aikyoMyakuV1", "aikyoCostsV1", "aikyoSubV1", "aikyoAbsenceV1", "aikyoSceneV1", "aikyoMoneyV1", "aikyoPlayV1"].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   persist(); render(); showView("home");
 }
 function showView(name) {
@@ -3421,7 +3528,10 @@ function renderRequests() {
 function togglePremium() { state.premium = !state.premium; persist(); render(); }
 function renderPhase3() {
   var b = document.getElementById("profileBanner");
-  if (b) b.style.display = state.profileSet ? "none" : "block";
+  if (b) {
+    if (state.profileSet) { if (b.remove) b.remove(); else b.style.display = "none"; }
+    else b.style.display = "block";
+  }
   renderBrake(); renderRequests();
   var pn = document.getElementById("planNow");
   if (pn) pn.textContent = state.premium ? "プレミアム（試作版・体験中）" : "無料プラン";
@@ -3943,7 +4053,7 @@ function qaAnswer(raw) {
   var hasBirth = !!p.birth;
   if (qaAny(q, ["解約", "退会", "キャンセル", "やめたい", "辞めたい"])) return "解約は「設定」→「プラン」の「解約する」からいつでもできます。解約しても、次回更新日まではプレミアムをそのまま使えます。違約金や解約手数料はありません。更新日の前日までに解約すれば、翌月分は請求されません。";
   if (qaAny(q, ["料金", "いくら", "値段", "月額", "課金", "お金", "費用"])) return "プレミアムは月額980円（税込）の1プランだけです。文字課金やポイント課金のような後から増える仕組みは一切ありません。料金は登録の前に総額で表示されます。無料でも、今日の恋愛運・占い4種の基本結果・毎日のミッションは使えます。";
-  if (qaAny(q, ["無料", "有料", "違い", "プレミアム"])) return "無料では、今日の恋愛運、占い4種の基本結果、今日のミッション（追加チャレンジは1日1回）、基本テクニック、脈あり診断（月3回まで）、ふりかえり記録が使えます。<br>プレミアム（月額980円）では、運勢の詳細、追加チャレンジ無制限、上級テクニック、生活・場所・趣味に合わせたカスタマイズ、脈あり診断の無制限利用、相性診断の詳細レポート、週次レポート、状況に合わせた振り返りが使えます。";
+  if (qaAny(q, ["無料", "有料", "違い", "プレミアム"])) return "無料では、今日の恋愛運、占い4種の基本結果、今日のミッション（追加チャレンジは1日1回）、基本テクニック、脈あり診断（月3回まで）、ふりかえり記録が使えます。<br>プレミアム（月額980円）では、運勢の詳細、追加チャレンジ無制限、上級テクニック、生活・場所・趣味に合わせたカスタマイズ、脈あり診断の無制限利用、相性診断の詳細レポート、週次レポート、状況に合わせた振り返り、お金の見える化（カテゴリ別グラフと無駄アドバイス）、体験占いの引き直しが使えます。";
   if (qaAny(q, ["見られ", "プライバシー", "個人情報", "安全", "漏れ", "流出", "誰か"])) return "見られません。生年月日・よく行く場所・気になる相手のこと・日々の記録は、すべてあなたの端末の中だけに保存され、外部のサーバーへ送信されることはありません。第三者が閲覧することは一切ありませんので、安心して正直に書いてください。具体的に書くほど、アドバイスも具体的になります。";
   if (qaAny(q, ["保存", "データ", "機種変更", "消える", "バックアップ"])) return "記録はあなたの端末の中（このアプリの保存領域）に残ります。アプリを開くたびに続きから使えます。ただし、ブラウザの履歴・データを消去すると記録も消えるので注意してください。端末を変える場合のデータ引き継ぎは、製品版で対応を進めています。";
   if (qaAny(q, ["基準", "仕組み", "根拠", "どうやって占", "当たる", "占い方"])) return "占いは4種類を組み合わせて出しています。<br>・九星気学：生年月日から割り出す「本命星」と、その日の星の巡り<br>・星座占い：生年月日の星座と、ラッキーカラー<br>・数秘術：生年月日のライフパスと、その日のデイパス<br>・風水・方位：自宅エリアから見た、その日の吉方位<br>1つの占いだけでは偏ってしまうので、複数を組み合わせて重なる部分を重視し、その日のあなた専用の運勢に調整しています。さらに、昨日のミッションを達成していると、今日の運勢の後押しとして反映されます。毎朝、その日の分が新しく出ます。";
@@ -4367,6 +4477,297 @@ var SEASON_REGIONAL = {
     11: { name: "灯りの季節", motif: "✨", line: "穏やかな冬の季節。年末は感謝を伝える時。「ありがとう」が運気を締めます。" }
   }
 };
+
+// ===== Phase 17: お金の見える化（かんたん／しっかりモード、記録は端末内のみ） =====
+var MONEY_KEY = "aikyoMoneyV1";
+var MONEY_CATS = ["食費", "日用品", "交通", "固定費", "交際・デート", "自分磨き", "趣味・娯楽", "その他"];
+function loadMoney() {
+  try { var v = JSON.parse(localStorage.getItem(MONEY_KEY)); if (v && typeof v === "object" && !Array.isArray(v)) { if (!v.incomes) v.incomes = {}; if (!Array.isArray(v.expenses)) v.expenses = []; if (v.mode !== "full") v.mode = "simple"; return v; } } catch (e) {}
+  return { mode: "simple", incomes: {}, expenses: [] };
+}
+function saveMoney(m) { try { localStorage.setItem(MONEY_KEY, JSON.stringify(m)); } catch (e) {} }
+function moneyYM() { var d = nowJ(); return d.getFullYear() + "-" + (d.getMonth() + 1); }
+function moneyIsThisMonth(dateStr) { var p = String(dateStr).split("-"); var d = nowJ(); return parseInt(p[0], 10) === d.getFullYear() && parseInt(p[1], 10) === d.getMonth() + 1; }
+function moneyTotals() {
+  var m = loadMoney();
+  var list = m.expenses.filter(function (e) { return moneyIsThisMonth(e.date); });
+  var total = 0; var byCat = {};
+  list.forEach(function (e) { total += e.amt; byCat[e.cat] = (byCat[e.cat] || 0) + e.amt; });
+  var love = 0;
+  loadArr(COST_KEY).forEach(function (c) { if (moneyIsThisMonth(c.date)) love += c.amt; });
+  return { m: m, list: list, total: total, byCat: byCat, income: m.incomes[moneyYM()] || 0, love: love };
+}
+function moneyAdviceText() {
+  var t = moneyTotals();
+  if (!t.list.length) return null;
+  var memoCount = {}, memoSum = {};
+  t.list.forEach(function (e) { if (e.memo) { memoCount[e.memo] = (memoCount[e.memo] || 0) + 1; memoSum[e.memo] = (memoSum[e.memo] || 0) + e.amt; } });
+  var bestMemo = null, bestN = 0;
+  for (var k in memoCount) if (memoCount[k] > bestN) { bestN = memoCount[k]; bestMemo = k; }
+  if (bestMemo && bestN >= 3) { var avg = Math.round(memoSum[bestMemo] / bestN); return "今月「" + escapeHtml(bestMemo) + "」が " + bestN + " 回、合計 " + memoSum[bestMemo].toLocaleString() + " 円でした。あと1回減らせると、約 " + avg.toLocaleString() + " 円が恋愛や自分磨きに回せます。"; }
+  var other = t.byCat["その他"] || 0;
+  if (t.total >= 5000 && other / t.total >= 0.3) return "今月の支出のうち「その他」が " + Math.round(other / t.total * 100) + "%（" + other.toLocaleString() + " 円）あります。カテゴリを分けて記録すると、無駄の正体が見えやすくなります。";
+  if (t.income > 0 && t.total > t.income * 0.9) return "今月の支出が収入の " + Math.round(t.total / t.income * 100) + "% まで来ています。月末までペースを少し落とすと安心です。";
+  var fixed = t.byCat["固定費"] || 0;
+  if (t.income > 0 && fixed / t.income >= 0.5) return "固定費が収入の " + Math.round(fixed / t.income * 100) + "% です。サブスクや保険など、見直せるものが1つあると毎月楽になります。";
+  return null;
+}
+function saveIncome() {
+  var v = parseInt(document.getElementById("mnIncome").value, 10);
+  if (isNaN(v) || v < 0) { alert("収入の金額を入れてください"); return; }
+  var m = loadMoney(); m.incomes[moneyYM()] = v; saveMoney(m); renderMoney();
+}
+function addMoney() {
+  var amt = parseInt(document.getElementById("mnAmount").value, 10);
+  if (!amt || amt <= 0) { alert("金額を入れてください"); return; }
+  var m = loadMoney();
+  m.expenses.push({ id: Date.now(), date: todayKey(), cat: document.getElementById("mnCat").value, memo: document.getElementById("mnMemo").value.trim(), amt: amt });
+  saveMoney(m);
+  document.getElementById("mnAmount").value = ""; document.getElementById("mnMemo").value = "";
+  renderMoney();
+}
+function delMoney(id) { var m = loadMoney(); m.expenses = m.expenses.filter(function (e) { return e.id !== id; }); saveMoney(m); renderMoney(); }
+function saveMoneyMode() { var m = loadMoney(); m.mode = document.getElementById("inMoneyMode").value === "full" ? "full" : "simple"; saveMoney(m); renderMoney(); }
+function setMoneyMode(mode) { var m = loadMoney(); m.mode = mode === "full" ? "full" : "simple"; saveMoney(m); renderMoney(); }
+function renderMoney() {
+  var t = moneyTotals(); var m = t.m;
+  var sel = document.getElementById("inMoneyMode"); if (sel) sel.value = m.mode;
+  var mn = document.getElementById("mnModeName"); if (mn) mn.textContent = m.mode === "full" ? "しっかり" : "かんたん";
+  var inc = document.getElementById("mnIncomeBox"); if (inc) inc.style.display = m.mode === "full" ? "" : "none";
+  var sum = document.getElementById("mnSummary");
+  if (sum) {
+    if (m.mode === "full") {
+      sum.innerHTML = "今月の収入: " + (t.income ? t.income.toLocaleString() + "円" : "未登録") + "／支出: " + t.total.toLocaleString() + "円" + (t.income ? "／残り: <span class=\"big\">" + (t.income - t.total).toLocaleString() + "円</span>" : "") + (t.love ? "<br>うち恋愛費（恋愛費の記録）: " + t.love.toLocaleString() + "円" : "");
+    } else {
+      sum.textContent = t.list.length ? ("今月の支出: " + t.total.toLocaleString() + "円") : "";
+    }
+  }
+  var det = document.getElementById("mnDetail");
+  if (det) {
+    if (m.mode !== "full") { det.innerHTML = ""; }
+    else if (!premiumActive()) {
+      det.innerHTML = '<div class="lockbox"><p class="text">🔒 カテゴリ別グラフと無駄アドバイスはプレミアムで見られます</p><p class="muted">記録そのものは無料で続けられます。</p><button class="ghost" onclick="showView(\'setting\')">プランを見る</button></div>';
+    } else {
+      var html = "";
+      var max = 0; for (var c in t.byCat) if (t.byCat[c] > max) max = t.byCat[c];
+      MONEY_CATS.forEach(function (cat) { var v = t.byCat[cat] || 0; if (!v) return; html += '<p class="small" style="margin:8px 0 2px">' + cat + ": " + v.toLocaleString() + '円</p><div class="lvbar-wrap"><div class="lvbar" style="width:' + Math.round(v / max * 100) + '%"></div></div>'; });
+      var adv = moneyAdviceText();
+      html += adv ? '<p class="text" style="margin-top:12px">💡 ' + adv + "</p>" : (t.list.length ? '<p class="muted" style="margin-top:12px">今月は目立つ無駄は見つかりませんでした。その調子です。</p>' : "");
+      det.innerHTML = html;
+    }
+  }
+  var list = document.getElementById("mnList");
+  if (list) {
+    var html2 = "";
+    m.expenses.slice(-10).reverse().forEach(function (e) { html2 += '<div class="cost-row"><span>' + e.date + "｜" + e.cat + (e.memo ? "｜" + escapeHtml(e.memo) : "") + "</span><span>" + e.amt.toLocaleString() + '円 <button class="del" onclick="delMoney(' + e.id + ')">消す</button></span></div>'; });
+    list.innerHTML = html2;
+  }
+}
+var _renderP17 = render;
+render = function () { _renderP17(); renderMoney(); };
+var _weeklyP17 = renderWeekly;
+renderWeekly = function () {
+  _weeklyP17();
+  if (!state.premium) return;
+  var adv = moneyAdviceText();
+  if (!adv) return;
+  var el = document.getElementById("weeklyReport");
+  if (el) el.innerHTML += '<p class="text">お金の見える化: ' + adv + "</p>";
+};
+
+// ===== Phase 19: 体験占い（タロット・おみくじ・花占い）と占い師キャラ =====
+var TELLERS = [
+  { id: "cat", emoji: "🐱", name: "ねこのミル", vibe: "ほんわか癒し系", open: ["にゃん。よく来たね。ゆっくり占うにゃ。", "にゃ〜ん。今日もがんばってる顔だにゃ。"], close: ["焦らなくて大丈夫にゃ。自分のペースが一番にゃ。", "小さな一歩で十分にゃ。応援してるにゃ。"] },
+  { id: "owl", emoji: "🦉", name: "フクロウのホー先生", vibe: "知的でクール", open: ["ふむ、来たか。静かに読み解いてみよう。", "ようこそ。星の並びは正直じゃよ。"], close: ["結論はシンプルじゃ。今日の一手を丁寧に。", "焦りは判断を曇らせる。落ち着いて進もう。"] },
+  { id: "fox", emoji: "🦊", name: "きつねのコンコン", vibe: "神秘的で大人", open: ["あら、いらっしゃい。月の光の下で占いましょう。", "ふふ…あなたの気配、少し変わってきたわ。"], close: ["答えは、もうあなたの中にあるのかもしれないわ。", "静かな自信が、いちばんの魅力よ。"] },
+  { id: "rabbit", emoji: "🐰", name: "うさぎのピョン", vibe: "元気いっぱい", open: ["わーい、来てくれた！今日も占っちゃうよ！", "ピョン！その意気だよ、占ってみよう！"], close: ["大丈夫、いけるいける！笑顔でいこう！", "その一歩、絶対ムダにならないよ！"] }
+];
+function tellerById(id) { for (var i = 0; i < TELLERS.length; i++) if (TELLERS[i].id === id) return TELLERS[i]; return null; }
+function curTeller() { return state.teller ? tellerById(state.teller) : null; }
+function tellerLine() { var t = curTeller(); if (!t) return ""; var o = t.open[Math.floor(Math.random() * t.open.length)]; var c = t.close[Math.floor(Math.random() * t.close.length)]; return '<p class="text">' + t.emoji + " " + t.name + "「" + o + " " + c + "」</p>"; }
+function chooseTeller(id) { state.teller = id; persist(); renderPlay(); }
+function changeTeller() { var v = document.getElementById("inTeller").value; state.teller = v || null; persist(); renderPlay(); }
+var PLAY_KEY = "aikyoPlayV1";
+function loadPlay() { var tk = todayKey(); try { var v = JSON.parse(localStorage.getItem(PLAY_KEY)); if (v && v.day === tk) return v; } catch (e) {} return { day: tk, tarot: 0, omikuji: 0, flower: 0 }; }
+function savePlay(p) { try { localStorage.setItem(PLAY_KEY, JSON.stringify(p)); } catch (e) {} }
+function canPlay(kind) { if (premiumActive()) return true; return (loadPlay()[kind] || 0) < 1; }
+function markPlayed(kind) { var p = loadPlay(); p[kind] = (p[kind] || 0) + 1; savePlay(p); }
+function playNote(kind) { var el = document.getElementById(kind + "Note"); if (!el) return; if (premiumActive()) { el.textContent = "プレミアム: 何回でも引き直せます。"; return; } el.textContent = (loadPlay()[kind] || 0) >= 1 ? "今日の分は終わりました（無料は1日1回まで）。プレミアムでは引き直せます。" : "無料は1日1回まで引けます。"; }
+var TAROT = [
+  ["愚者", "🌟", "新しい始まり。気負わず、最初の一歩を軽く。"],
+  ["魔術師", "🎩", "きっかけは自分で作れます。道具は揃っています。"],
+  ["女教皇", "🌙", "直感が冴える時。相手の本音が見えやすくなります。"],
+  ["女帝", "🌹", "魅力と豊かさ。受け取る準備をして。"],
+  ["皇帝", "👑", "自信を持って。主導権はあなたにあります。"],
+  ["教皇", "🕊", "誠実さが信頼を深めます。約束を大切に。"],
+  ["恋人", "💕", "心が通い合う予感。選択は素直な気持ちで。"],
+  ["戦車", "🏇", "勢いがあります。自分から動くと進展します。"],
+  ["力", "🦁", "優しさが一番の強さ。包み込む余裕を。"],
+  ["隠者", "🏮", "一人の時間で気持ちを整えると、答えが見えます。"],
+  ["運命の輪", "🎡", "流れが動き出す転機。チャンスを逃さずに。"],
+  ["正義", "⚖", "バランスが鍵。相手にも自分にも公平に。"],
+  ["吊るされた男", "🌿", "待つことも愛情。視点を変えると楽になります。"],
+  ["死神", "🦋", "終わりは、新しい始まりの合図です。"],
+  ["節制", "🍶", "ほどよい距離感が、心地よさを生みます。"],
+  ["悪魔", "🖤", "執着しすぎに注意。軽やかさを取り戻して。"],
+  ["塔", "⚡", "予想外の出来事が、停滞を壊してくれます。"],
+  ["星", "⭐", "希望の光。願いは口に出すと近づきます。"],
+  ["月", "🌕", "不安は錯覚かもしれません。確かめる勇気を。"],
+  ["太陽", "☀", "明るさ全開。笑顔が最大の魅力です。"],
+  ["審判", "🔔", "目覚めの時。過去のご縁が戻ることも。"],
+  ["世界", "🌍", "完成と実り。良い循環の真ん中にいます。"]
+];
+var TAROT_POS = ["今の状況", "気をつけること", "アドバイス"];
+var tarotState = null;
+function drawTarot() {
+  if (!curTeller()) { alert("まず占い師を選んでください"); return; }
+  if (!canPlay("tarot")) { alert("今日のタロットは引き終わりました。プレミアムでは引き直せます"); return; }
+  var idx = [];
+  while (idx.length < 3) { var n = Math.floor(Math.random() * TAROT.length); if (idx.indexOf(n) < 0) idx.push(n); }
+  tarotState = { cards: idx, flipped: 0, done: false };
+  var html = "";
+  for (var i = 0; i < 3; i++) {
+    html += '<div class="tcard" id="tcard' + i + '" onclick="flipTarot(' + i + ')"><div class="tcard-inner"><div class="tcard-face tcard-back">🌙</div><div class="tcard-face tcard-front"><div style="font-size:26px">' + TAROT[idx[i]][1] + '</div><div><b>' + TAROT[idx[i]][0] + '</b></div><div class="small">' + TAROT_POS[i] + '</div></div></div></div>';
+  }
+  document.getElementById("tarotStage").innerHTML = html;
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">カードを1枚ずつタップして、めくってください。</p>';
+}
+function flipTarot(i) {
+  if (!tarotState || tarotState.done) return;
+  var el = document.getElementById("tcard" + i);
+  if (!el || el.className.indexOf("flipped") >= 0) return;
+  el.className += " flipped";
+  tarotState.flipped++;
+  if (tarotState.flipped >= 3) {
+    tarotState.done = true;
+    markPlayed("tarot");
+    var html = "";
+    for (var j = 0; j < 3; j++) { var c = TAROT[tarotState.cards[j]]; html += '<p class="text"><span class="tag">' + TAROT_POS[j] + "</span><b>" + c[0] + "</b>：" + c[2] + "</p>"; }
+    html += tellerLine();
+    if (!premiumActive()) html += '<p class="small">今日のタロットはここまでです。プレミアムでは引き直せます。</p>';
+    document.getElementById("tarotResult").innerHTML = html;
+    playNote("tarot");
+  }
+}
+var OMIKUJI = [
+  { r: "大吉", w: 15, msgs: ["恋の追い風が強い日。気になる人への一歩が実りやすいです。", "笑顔が最大のお守り。自分から声をかけると良い流れになります。"] },
+  { r: "中吉", w: 25, msgs: ["穏やかに良い流れ。焦らず、いつもの優しさを丁寧に。", "小さな親切が、相手の記憶に残る日です。"] },
+  { r: "小吉", w: 25, msgs: ["小さな幸せが積み重なる日。挨拶＋一言を大切に。", "派手な動きより、丁寧な返信が効く日です。"] },
+  { r: "吉", w: 20, msgs: ["安定した運気。続けてきたことが、少しずつ効いてきます。", "今日は聞き役に回ると好印象です。"] },
+  { r: "末吉", w: 15, msgs: ["今は種まきの時期。結果を急がず、自分磨きに時間を使って。", "うまくいかなくても運気の底ではありません。整える日にしましょう。"] }
+];
+function drawOmikuji() {
+  if (!curTeller()) { alert("まず占い師を選んでください"); return; }
+  if (!canPlay("omikuji")) { alert("今日のおみくじは引き終わりました。プレミアムでは引き直せます"); return; }
+  markPlayed("omikuji");
+  var total = 0; OMIKUJI.forEach(function (o) { total += o.w; });
+  var n = Math.random() * total, pick = OMIKUJI[OMIKUJI.length - 1];
+  for (var i = 0; i < OMIKUJI.length; i++) { n -= OMIKUJI[i].w; if (n <= 0) { pick = OMIKUJI[i]; break; } }
+  var msg = pick.msgs[Math.floor(Math.random() * pick.msgs.length)];
+  document.getElementById("omikujiResult").innerHTML = '<p class="text">今日の恋愛運は <span class="big">' + pick.r + '</span> です。</p><p class="text">' + msg + "</p>" + tellerLine();
+  playNote("omikuji");
+}
+var flowerState = null;
+function startFlower() {
+  if (!curTeller()) { alert("まず占い師を選んでください"); return; }
+  if (!canPlay("flower")) { alert("今日の花占いは終わりました。プレミアムではもう一度できます"); return; }
+  flowerState = { left: 7 + Math.floor(Math.random() * 5), step: 0, done: false, label: "", result: "" };
+  renderFlower();
+}
+function renderFlower() {
+  var el = document.getElementById("flowerStage");
+  if (!el) return;
+  if (!flowerState) { el.innerHTML = ""; return; }
+  var petals = "";
+  for (var i = 0; i < flowerState.left; i++) petals += "🌸";
+  var html = '<p class="petals">' + petals + "</p>";
+  if (flowerState.done) {
+    html += '<p class="text">' + flowerState.result + "</p>" + tellerLine();
+  } else {
+    html += '<p class="text">' + (flowerState.step === 0 ? "花びらが " + flowerState.left + " 枚あります。" : flowerState.label) + '</p><button class="ghost" onclick="pluckPetal()">花びらを1枚取る</button>';
+  }
+  el.innerHTML = html;
+}
+function pluckPetal() {
+  if (!flowerState || flowerState.done) return;
+  flowerState.step++;
+  flowerState.left--;
+  flowerState.label = flowerState.step % 2 === 1 ? "近づいている…" : "まだ様子見…";
+  if (flowerState.left <= 0) {
+    flowerState.done = true;
+    markPlayed("flower");
+    flowerState.result = flowerState.label.indexOf("近づいて") === 0 ? "花占いの結果：気持ちは近づいています。今日の一手で、小さな一歩を。" : "花占いの結果：まだ様子見の時期です。焦らず、好印象を積み重ねる時間にしましょう。";
+    renderFlower();
+    playNote("flower");
+    return;
+  }
+  renderFlower();
+}
+function renderPlay() {
+  var pick = document.getElementById("tellerPick");
+  var now = document.getElementById("tellerNow");
+  var t = curTeller();
+  if (pick && now) {
+    if (!t) {
+      var html = '<p class="text">まずは、あなたの占い師を選んでください。</p><div class="teller-grid">';
+      TELLERS.forEach(function (x) { html += '<button class="ghost teller-btn" onclick="chooseTeller(\'' + x.id + '\')"><span class="teller-emoji">' + x.emoji + '</span>' + x.name + '<br><span class="small">' + x.vibe + "</span></button>"; });
+      html += "</div>";
+      pick.innerHTML = html;
+      now.innerHTML = "";
+    } else {
+      pick.innerHTML = "";
+      now.innerHTML = '<p class="text">あなたの占い師は ' + t.emoji + " <b>" + t.name + "</b>（" + t.vibe + '）です。</p><p class="muted">占い師の変更は「設定」からできます。</p>';
+    }
+  }
+  var sel = document.getElementById("inTeller"); if (sel) sel.value = state.teller || "";
+  playNote("tarot"); playNote("omikuji"); playNote("flower");
+}
+var _renderP19 = render;
+render = function () { _renderP19(); renderPlay(); };
+
+// ===== Phase 16: レベル画面の見える化（ポイント・進捗バー・直近4週間グラフ） =====
+function lvKeyOf(d) { return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+function renderLevelPlus() {
+  var done = state.done || {};
+  var td = totalDone();
+  var lv = level();
+  var pts = document.getElementById("lvPoints");
+  if (pts) pts.textContent = String(td * 10);
+  var bar = document.getElementById("lvBar");
+  var next = document.getElementById("lvNext");
+  var pct, msg;
+  if (lv >= 3) { pct = 100; msg = "最高レベルのLv3です。ここからも、毎日の積み上げがポイントになります。"; }
+  else if (lv === 2) { pct = Math.round((td - 7) / 14 * 100); msg = "あと " + (21 - td) + " 日の積み上げで Lv3 になります（現在 " + td + " 日）。"; }
+  else { pct = Math.round(td / 7 * 100); msg = "あと " + (7 - td) + " 日の積み上げで Lv2 になります（現在 " + td + " 日）。"; }
+  if (bar) bar.style.width = pct + "%";
+  if (next) next.textContent = msg;
+  for (var i = 1; i <= 3; i++) {
+    var b = document.getElementById("lvBadge" + i);
+    if (!b) continue;
+    if (i === lv) { b.textContent = "いまここ"; b.className = "lvbadge"; b.style.display = ""; }
+    else if (i < lv) { b.textContent = "✓ 達成"; b.className = "lvbadge done"; b.style.display = ""; }
+    else { b.textContent = ""; b.className = "lvbadge"; b.style.display = "none"; }
+  }
+  var wrap = document.getElementById("lvDots");
+  if (wrap) {
+    var html = "";
+    var start = nowJ(); start.setDate(start.getDate() - 27);
+    for (var n = 0; n < 28; n++) {
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + n);
+      var v = done[lvKeyOf(d)];
+      var isToday = lvKeyOf(d) === todayKey();
+      var cls = "dot" + (isToday ? " today" : "");
+      var ch;
+      if (v === true) { ch = "💗"; }
+      else if (v === "na") { ch = "💛"; }
+      else { ch = "・"; cls += " off"; }
+      html += '<span class="' + cls + '" title="' + (d.getMonth() + 1) + "/" + d.getDate() + '">' + ch + "</span>";
+    }
+    wrap.innerHTML = html;
+  }
+}
+var _renderP16 = render;
+render = function () { _renderP16(); renderLevelPlus(); };
 
 applyTheme();
 render();
