@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>恋運予報</title>
+<title>こい運予報</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e75480">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="恋運予報">
+<meta name="apple-mobile-web-app-title" content="こい運予報">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   * { box-sizing: border-box; }
@@ -320,7 +320,7 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
     <div class="cover" id="coverBox">
       <div class="cover-pattern" id="coverPattern"></div>
       <div class="cover-inner">
-        <div class="cover-title">恋運予報</div>
+        <div class="cover-title">こい運予報</div>
         <div class="cover-sub">今日の恋愛運 〜毎日の小さな行動が、運気を連れてくる〜</div>
         <div class="cover-hearts">♡ ♡ ♡</div>
       </div>
@@ -817,7 +817,7 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
 <div id="subModal" style="display:none; position:fixed; inset:0; background:rgba(60,20,50,.55); z-index:60; padding:18px; overflow:auto;">
   <div class="card" style="max-width:420px; margin:40px auto;">
     <h2>プレミアム登録</h2>
-    <p class="text">恋運予報 プレミアム</p>
+    <p class="text">こい運予報 プレミアム</p>
     <p class="text"><span class="big">月額 450円（税込）</span></p>
     <p class="muted">登録日から1か月ごとに自動更新されます。解約しても期間の終わりまで使えます。料金はこの450円のみで、文字課金などの追加料金はありません。</p>
     <p class="muted">決済はStripeの安全な画面で行います。下のボタンを押すとStripeの決済画面に移動します。支払いが終わったら、このアプリに戻ってきてください。</p>
@@ -4275,13 +4275,13 @@ function askQuick(q) { document.getElementById("qaInput").value = q; askQuestion
 
 
 // ===== Phase 12: 友達に渡す（シェア・QR・URLコピー） =====
-var SHARE_TEXT = "毎朝の恋愛運と「今日やる小さな一手」が出るアプリ『恋運予報』。占いだけじゃなく、私の生活に合わせたアドバイスまで出るよ。無料で始められます。";
+var SHARE_TEXT = "毎朝の恋愛運と「今日やる小さな一手」が出るアプリ『こい運予報』。占いだけじゃなく、私の生活に合わせたアドバイスまで出るよ。無料で始められます。";
 function appUrl() { try { return String(location.href).split("#")[0]; } catch (e) { return ""; } }
 function shareApp() {
   var url = appUrl();
   var msgEl = document.getElementById("shareMsg");
   if (navigator.share) {
-    navigator.share({ title: "恋運予報", text: SHARE_TEXT, url: url }).catch(function () {});
+    navigator.share({ title: "こい運予報", text: SHARE_TEXT, url: url }).catch(function () {});
     return;
   }
   copyAppUrl();
