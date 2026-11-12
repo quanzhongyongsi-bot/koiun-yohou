@@ -4776,6 +4776,8 @@ var TELLER_REACT = {
   cat: { good: "月の光がいちばん明るい夜みたい。素直な気持ちが、そのまま届くはずにゃ。", mid: "焦らなくて大丈夫。毛糸玉みたいに、気持ちはゆっくりほぐれていくにゃ。", calm: "今は整える時。温かい飲み物で、自分を甘やかしてあげてにゃ。" }
 };
 function later(fn, ms) { setTimeout(fn, reduceMotion() ? Math.min(ms, 200) : ms); }
+// ===== Phase 33: カメラの自動切り替え（選んだらミルの画面へ自動で戻る） =====
+function focusTarotEl(id) { var el = document.getElementById(id); if (!el) return; try { el.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }); } catch (e) { el.scrollIntoView(); } }
 function burstIn(el) { if (!el || reduceMotion()) return; var em = ["✨", "🌸", "💗", "⭐"]; var made = []; for (var i = 0; i < 12; i++) { var s = document.createElement("span"); s.className = "burst-p"; s.textContent = em[i % em.length]; var ang = (Math.PI * 2 * i) / 12 + Math.random() * 0.5; var dist = 56 + Math.random() * 46; try { s.style.setProperty("--bx", Math.round(Math.cos(ang) * dist) + "px"); s.style.setProperty("--by", Math.round(Math.sin(ang) * dist) + "px"); } catch (e) {} el.appendChild(s); made.push(s); } setTimeout(function () { made.forEach(function (x) { try { x.remove(); } catch (e) {} }); }, 1100); }
 var PLAY_KEY = "aikyoPlayV1";
 function loadPlay() { var tk = todayKey(); try { var v = JSON.parse(localStorage.getItem(PLAY_KEY)); if (v && v.day === tk) return v; } catch (e) {} return { day: tk, tarot: 0, omikuji: 0, flower: 0 }; }
@@ -4921,6 +4923,7 @@ function startShufflePhase(nextPick) {
   renderTableStage(-1);
   document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルが全力でカードを混ぜています。聞きたいことを、心の中でそっと唱えてください。</p>';
   typeSpeech(sessionLine("shuffle" + nextPick));
+  focusTarotEl("tarotScene");
   later(startPick, reduceMotion() ? 500 : 3000);
 }
 function startPick() {
@@ -4932,6 +4935,7 @@ function startPick() {
   renderTableStage(-1);
   document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルがカードを広げました。' + (tarotState.dealt + 1) + '枚目は「' + TAROT_POS[tarotState.dealt] + '」のカード。ピンとくる1枚をタップしてください。</p>';
   typeSpeech(sessionLine("pick" + (tarotState.dealt + 1)));
+  focusTarotEl("tarotStage");
 }
 function shuffledDeckFiltered() {
   var d = shuffledDeck();
@@ -4950,6 +4954,7 @@ function pickCard(j) {
   document.getElementById("tarotResult").innerHTML = '<p class="muted">' + tarotState.dealt + '枚目が決まりました。</p>';
   typeSpeech(sessionLine("react" + tarotState.dealt));
   burstIn(document.getElementById("tarotStage"));
+  later(function () { focusTarotEl("tarotScene"); }, 500);
   later(afterPick, reduceMotion() ? 400 : 1500);
 }
 function afterPick() {
@@ -4964,6 +4969,7 @@ function startRevealPhase() {
   renderTableStage(-1);
   typeSpeech(sessionLine("reveal"));
   document.getElementById("tarotResult").innerHTML = '<p class="muted">3枚そろいました。ミルが1枚ずつ開いていきます。</p>';
+  focusTarotEl("tarotStage");
   later(revealStep, 1300);
 }
 function revealStep() {
