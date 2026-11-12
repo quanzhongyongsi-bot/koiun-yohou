@@ -368,6 +368,7 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
         <p class="muted" id="fBase"></p>
         <p class="text" id="fLuck"></p>
         <p class="text" id="fBoost"></p>
+        <p class="small">星の数は、このアプリ独自の目安です。</p>
       </div>
       <div class="card" id="tasksCard">
         <h2>今日のやること</h2>
@@ -3233,11 +3234,21 @@ var TECHS = [
   { cat: "上級テクニック", premium: true, items: [
     { ok: "断られた後の帰り道で「今日は誘ってくれてありがとう」と先に伝える", ng: "気まずさから急に冷たくする／無言になる", note: "断られた場面こそ魅力の見せどころ。お礼を先に言える人は、次に声をかけてもらえます。" },
     { ok: "相手の小さな変化（髪型・持ち物・様子）に気づいて一言かける", ng: "「疲れてる？」を毎日繰り返す", note: "変化に気づく一言は、好意のサインとして一番自然に届きます。頻度は週に1〜2回まで。" }
+  ]},
+  { cat: "気持ちの伝え方", items: [
+    { ok: "「さっきの返事が短くて、少し寂しかったです」と、場面と自分の気持ちで伝える", ng: "「いつも冷たいよね」「なんで分かってくれないの」と、人格や全面否定で言う", note: "不満は相手の人格ではなく、具体的な場面と自分の気持ちで伝えると、対立が深まりにくいとされます（ゴットマンの研究より）。" }
+  ]},
+  { cat: "名前と関心", items: [
+    { ok: "相手の名前を呼んでから「この前話してた旅行、どうでした？」と、相手の関心事を聞く", ng: "名前も呼ばず、自分の話ばかり続けて要件だけ言う", note: "名前と関心事は、好意を伝える素直な形です。褒め言葉は「誠実に、本当に思ったこと」を言うのが前提（カーネギー『人を動かす』）。お世辞は逆効果になります。" }
+  ]},
+  { cat: "会話の深め方", items: [
+    { ok: "軽い話題 → 最近の小さな出来事 → 「最近うれしかったこと」と少しずつ深くし、自分も同じくらい話す", ng: "初対面で踏み込んだ質問を連発して、自分は話さない", note: "親密さは、少しずつ深める質問と、同じくらい自分も開くことの往復で育つとされます（アロン他の研究）。「恋に落ちる」ための質問ではなく、距離を縮める会話の進め方です。" }
   ]}
 ];
 var STAR_NAMES = ["", "一白水星", "二黒土星", "三碧木星", "四緑木星", "五黄土星", "六白金星", "七赤金星", "八白土星", "九紫火星"];
 var DIRS = ["北", "北東", "東", "南東", "南", "南西", "西", "北西"];
 var COLORS = ["ピンク", "白", "水色", "ベージュ", "ラベンダー", "ミントグリーン", "ゴールド", "赤"];
+var LUCKY_BY_STAR = { 1: "紺", 2: "ベージュ", 3: "青", 4: "緑", 5: "黄", 6: "白", 7: "白", 8: "ベージュ", 9: "赤" }; // 本命星の五行にちなんだ色（Phase 37）
 var FORTUNES = [
   null,
   { label: "充電日", stars: 1, comment: "今日は無理に動く日ではありません。小さなレッスンを1つだけ丁寧にやって、自分を整える日にしましょう。" },
@@ -3272,16 +3283,22 @@ function honmeiStar(birth) {
   return star;
 }
 function zodiac(m, d) {
-  var z = [[3,20,"牡羊座"],[4,20,"牡牛座"],[5,21,"双子座"],[6,22,"蟹座"],[7,23,"獅子座"],[8,23,"乙女座"],[9,23,"天秤座"],[10,24,"蠍座"],[11,23,"射手座"],[12,22,"山羊座"],[1,20,"水瓶座"],[2,19,"魚座"]];
+  var z = [[3,20,"牡羊座"],[4,20,"牡牛座"],[5,21,"双子座"],[6,21,"蟹座"],[7,23,"獅子座"],[8,23,"乙女座"],[9,23,"天秤座"],[10,23,"蠍座"],[11,22,"射手座"],[12,22,"山羊座"],[1,20,"水瓶座"],[2,19,"魚座"]];
   for (var i = 0; i < z.length; i++) { var a = z[i]; var b = z[(i + 1) % 12]; if ((m === a[0] && d >= a[1]) || (m === b[0] && d < b[1])) return a[2]; }
   return "山羊座";
 }
+function reduceMaster(n) { while (n > 9 && n !== 11 && n !== 22 && n !== 33) n = digitSum(n); return n; }
 function lifePath(birth) {
-  var s = "" + birth.getFullYear() + (birth.getMonth() + 1) + birth.getDate();
-  var n = 0; for (var i = 0; i < s.length; i++) n += parseInt(s[i], 10);
-  while (n > 9) n = digitSum(n);
-  return n;
+  var m = reduceMaster(birth.getMonth() + 1);
+  var d = reduceMaster(birth.getDate());
+  var y = reduceMaster(digitSum(birth.getFullYear()));
+  return reduceMaster(m + d + y);
 }
+var LIFEPATH_MASTER_TEXT = {
+  11: "ライフパス11は、直感と感受性が豊かとされる特別な数字（マスターナンバー）。気持ちが揺れやすい面もあるので、深呼吸で整える時間を大切に。",
+  22: "ライフパス22は、大きな夢を形にする力があるとされる特別な数字（マスターナンバー）。焦らず、今日の一歩を積み重ねることが近道です。",
+  33: "ライフパス33は、人を思いやる気持ちが強いとされる特別な数字（マスターナンバー）。まず自分を大切にすることが、優しさの土台になります。"
+};
 function totalDone() { var c = 0; for (var k in state.done) if (state.done[k]) c++; return c; }
 function level() { var t = totalDone(); return t >= 21 ? 3 : (t >= 7 ? 2 : 1); }
 function streak() {
@@ -3306,13 +3323,13 @@ function render() {
     document.getElementById("fStars").textContent = "★★★★★".slice(0, score) + "☆☆☆☆☆".slice(0, 5 - score);
     document.getElementById("fLabel").textContent = f.label;
     document.getElementById("fComment").textContent = f.comment;
-    document.getElementById("fBase").textContent = "あなたの本命星は " + STAR_NAMES[hm] + "／星座は " + zodiac(b.getMonth() + 1, b.getDate()) + "／ライフパスナンバーは " + lifePath(b) + " です（簡易計算）。";
-    document.getElementById("fLuck").textContent = "今日のラッキー方角は「" + DIRS[(dn + hm) % 8] + "」、ラッキーカラーは「" + COLORS[(dn + hm) % 8] + "」。" + (state.profile.work ? "勤務先（" + state.profile.work + "）方面へ出かける用事があれば、良い流れです。" : "");
+    document.getElementById("fBase").textContent = "あなたの本命星は " + STAR_NAMES[hm] + "／星座は " + zodiac(b.getMonth() + 1, b.getDate()) + "／ライフパスナンバーは " + lifePath(b) + " です（簡易計算です。立春（2月3〜5日ごろ）の前後に生まれた方は、前年の星で見る場合があります）。星座の境目の日に生まれた方は、生まれた年や時刻によって前後の星座になることがあります。";
+    document.getElementById("fLuck").textContent = "今日のラッキー方角は「" + DIRS[(dn + hm) % 8] + "」、ラッキーカラーは「" + LUCKY_BY_STAR[hm] + "」。" + (state.profile.work ? "勤務先（" + state.profile.work + "）方面へ出かける用事があれば、小さな一歩のきっかけにしてみて。" : "");
     var dp = dayPath(b, d);
-    document.getElementById("uKyusei").textContent = STAR_NAMES[hm] + "（本命星）／今日は" + STAR_NAMES[(hm + dn) % 9 || 9] + "の巡り";
-    document.getElementById("uZodiac").textContent = zodiac(b.getMonth() + 1, b.getDate()) + "／ラッキーカラーは「" + COLORS[(dn + hm) % 8] + "」";
-    document.getElementById("uSuhi").textContent = "ライフパス " + lifePath(b) + "／今日のデイパスは " + dp + " ─ " + DAYPATH_TEXT[dp];
-    document.getElementById("uHoui").textContent = "今日の吉方位は「" + DIRS[(dn + hm) % 8] + "」" + (state.profile.home ? "（自宅エリアから見た方角）" : "");
+    document.getElementById("uKyusei").textContent = STAR_NAMES[hm] + "（本命星）／今日は" + STAR_NAMES[(hm + dn) % 9 || 9] + "の巡り（アプリの目安）";
+    document.getElementById("uZodiac").textContent = zodiac(b.getMonth() + 1, b.getDate()) + "／ラッキーカラーは「" + LUCKY_BY_STAR[hm] + "」（本命星の五行より）";
+    var lpv = lifePath(b); document.getElementById("uSuhi").textContent = "ライフパス " + lpv + "／今日のデイパスは " + dp + " ─ " + DAYPATH_TEXT[dp] + (LIFEPATH_MASTER_TEXT[lpv] ? " " + LIFEPATH_MASTER_TEXT[lpv] : "");
+    document.getElementById("uHoui").textContent = "今日の方位の目安は「" + DIRS[(dn + hm) % 8] + "」（このアプリ独自の目安です）";
     document.getElementById("fBoost").textContent = state.done[yesterdayKey()] ? "昨日の一歩が、今日の恋愛運を押し上げています。" : "";
     document.getElementById("fUnchiku").textContent = UNCHIKU[dn % UNCHIKU.length];
     document.getElementById("fLevelName").textContent = "現在のレベル: Lv" + level();
@@ -3733,7 +3750,13 @@ render = function () { _renderBase(); renderPhase3(); };
 /* ===== Phase 4: 占い全面化・追加チャレンジ ===== */
 var DAYPATH_TEXT = { 1: "始める力の日。小さな一歩に追い風。", 2: "寄り添う日。相手の話を聞くほど運気アップ。", 3: "表現の日。明るい挨拶が効く日。", 4: "整える日。身だしなみと約束を丁寧に。", 5: "変化の日。いつもと違う道・違う一言を。", 6: "与える日。小さな親切が巡ってくる。", 7: "見つめる日。焦らず、自分の気持ちを確認。", 8: "実りの日。積み重ねが形になりやすい。", 9: "手放す日。執着をゆるめると新しい風。" };
 function digitSum(n) { var s = 0; var t = String(n); for (var i = 0; i < t.length; i++) s += parseInt(t.charAt(i), 10) || 0; return s; }
-function dayPath(b, d) { var v = digitSum(b.getFullYear() * 10000 + (b.getMonth() + 1) * 100 + b.getDate()) + digitSum(d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()); while (v > 9) v = digitSum(v); return v; }
+function root9(n) { while (n > 9) n = digitSum(n); return n; }
+function dayPath(b, d) {
+  var sun = root9(digitSum(b.getMonth() + 1) + digitSum(b.getDate()));
+  var py = root9(sun + root9(digitSum(d.getFullYear())));
+  var pm = root9(py + root9(digitSum(d.getMonth() + 1)));
+  return root9(pm + root9(digitSum(d.getDate())));
+}
 function yesterdayKey() { var d = nowJ(); d.setDate(d.getDate() - 1); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
 var EXTRA_POOL = {
   1: ["鏡の前で、笑顔を3秒キープする", "今日会った人に、目を見て「ありがとう」を言う", "背筋を伸ばして5分歩く", "今日の服に、小さな色物を1つ足す"],
@@ -4303,7 +4326,7 @@ function qaAnswer(raw) {
   if (qaAny(q, ["無料", "有料", "違い", "プレミアム"])) return "無料では、今日の恋愛運、占い4種の基本結果、今日のミッション（追加チャレンジは1日1回）、基本テクニック、脈あり診断（月3回まで）、ふりかえり記録が使えます。<br>プレミアム（月額450円）では、運勢の詳細、追加チャレンジ無制限、上級テクニック、生活・場所・趣味に合わせたカスタマイズ、脈あり診断の無制限利用、相性診断の詳細レポート、週次レポート、状況に合わせた振り返り、お金の見える化（カテゴリ別グラフと無駄アドバイス）、体験占いの引き直しが使えます。";
   if (qaAny(q, ["見られ", "プライバシー", "個人情報", "安全", "漏れ", "流出", "誰か"])) return "見られません。生年月日・よく行く場所・気になる相手のこと・日々の記録は、すべてあなたの端末の中だけに保存され、外部のサーバーへ送信されることはありません。第三者が閲覧することは一切ありませんので、安心して正直に書いてください。具体的に書くほど、アドバイスも具体的になります。";
   if (qaAny(q, ["保存", "データ", "機種変更", "消える", "バックアップ"])) return "記録はあなたの端末の中（このアプリの保存領域）に残ります。アプリを開くたびに続きから使えます。ただし、ブラウザの履歴・データを消去すると記録も消えるので注意してください。端末を変える場合のデータ引き継ぎは、製品版で対応を進めています。";
-  if (qaAny(q, ["基準", "仕組み", "根拠", "どうやって占", "当たる", "占い方"])) return "占いは4種類を組み合わせて出しています。<br>・九星気学：生年月日から割り出す「本命星」と、その日の星の巡り<br>・星座占い：生年月日の星座と、ラッキーカラー<br>・数秘術：生年月日のライフパスと、その日のデイパス<br>・風水・方位：自宅エリアから見た、その日の吉方位<br>1つの占いだけでは偏ってしまうので、複数を組み合わせて重なる部分を重視し、その日のあなた専用の運勢に調整しています。さらに、昨日のミッションを達成していると、今日の運勢の後押しとして反映されます。毎朝、その日の分が新しく出ます。";
+  if (qaAny(q, ["基準", "仕組み", "根拠", "どうやって占", "当たる", "占い方"])) return "占いは4種類を組み合わせて出しています。<br>・九星気学：生年月日から割り出す「本命星」と、その日の星の巡り<br>・星座占い：生年月日の星座と、ラッキーカラー<br>・数秘術：生年月日のライフパスと、その日のデイパス<br>・風水・方位：その日の方位の目安<br>1つの占いだけでは偏ってしまうので、複数を組み合わせて重なる部分を重視し、その日のあなた専用の運勢に調整しています。さらに、昨日のミッションを達成していると、今日の運勢の後押しとして反映されます。毎朝、その日の分が新しく出ます。";
   if (qaAny(q, ["今日の運勢", "今日は", "運勢は", "運勢を教え"])) {
     var k = document.getElementById("uKyusei").textContent, z = document.getElementById("uZodiac").textContent, s = document.getElementById("uSuhi").textContent, h = document.getElementById("uHoui").textContent;
     if (k || z) return "今日のあなたの運勢です。<br>・九星気学：" + k + "<br>・星座占い：" + z + "<br>・数秘術：" + s + "<br>・風水・方位：" + h + "<br>詳しくは「今日の予報」の「今日の恋愛運」と「今日の占い」に出ています。";
@@ -4314,7 +4337,7 @@ function qaAnswer(raw) {
     return "本命星は、生年月日から九星気学で割り出す「その人の基本の星」です。設定で生年月日を登録すると、あなたの本命星で占えるようになります。";
   }
   if (qaAny(q, ["ライフパス", "数秘"])) {
-    if (hasBirth) return "あなたのライフパスは「" + lifePath(new Date(p.birth)) + "」です。生年月日の数字をすべて足して割り出す数秘術の基本数で、その人の進み方の傾向を表します。今日のデイパス（日ごとの数）と合わせて、「今日の予報」で毎日の運勢に使っています。";
+    if (hasBirth) return "あなたのライフパスは「" + lifePath(new Date(p.birth)) + "」です。生年月日を月・日・年ごとに分けて足し上げて割り出す数秘術の基本数で、11・22・33はマスターナンバーとしてそのまま見る場合がある数で、その人の進み方の傾向を表します。今日のデイパス（日ごとの数）と合わせて、「今日の予報」で毎日の運勢に使っています。";
     return "ライフパスは、生年月日から割り出す数秘術の基本数です。設定で生年月日を登録すると、あなたの数で占えるようになります。";
   }
   if (qaAny(q, ["星座"])) {
@@ -4848,7 +4871,7 @@ function playNote(kind) { var el = document.getElementById(kind + "Note"); if (!
 var TAROT = [
   ["愚者", "🌟", "新しい始まり。気負わず、最初の一歩を軽く。"],
   ["魔術師", "🎩", "きっかけは自分で作れます。道具は揃っています。"],
-  ["女教皇", "🌙", "直感が冴える時。相手の本音が見えやすくなります。"],
+  ["女教皇", "🌙", "まだ言葉にならない気持ちを、大切にする時。相手の本音も、まだ見えないままで大丈夫。焦らず、静かに感じ取って。"],
   ["女帝", "🌹", "魅力と豊かさ。受け取る準備をして。"],
   ["皇帝", "👑", "自信を持って。主導権はあなたにあります。"],
   ["教皇", "🕊", "誠実さが信頼を深めます。約束を大切に。"],
@@ -4864,13 +4887,13 @@ var TAROT = [
   ["悪魔", "🖤", "執着しすぎに注意。軽やかさを取り戻して。"],
   ["塔", "⚡", "予想外の出来事が、停滞を壊してくれます。"],
   ["星", "⭐", "希望の光。願いは口に出すと近づきます。"],
-  ["月", "🌕", "不安は錯覚かもしれません。確かめる勇気を。"],
+  ["月", "🌕", "不安が膨らみやすい時。思い込みで動かず、確かめるのは気持ちが落ち着いてからに。今日は小さな安心を積み重ねて。"],
   ["太陽", "☀", "明るさ全開。笑顔が最大の魅力です。"],
   ["審判", "🔔", "目覚めの時。過去のご縁が戻ることも。"],
   ["世界", "🌍", "完成と実り。良い循環の真ん中にいます。"]
 ];
 var TAROT_POS = ["今の状況", "気をつけること", "アドバイス"];
-var TAROT_TONE = [1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, -1, -1, 1, 0, 1, 1, 1];
+var TAROT_TONE = [1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, -1, -1, 1, -1, 1, 1, 1];
 var tarotState = null;
 function reduceMotion() { try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) { return false; } }
 var SESSION_LINES = {
