@@ -134,7 +134,9 @@
   .mt-dl { font-size: 10px; color: #888; margin-top: 3px; }
   /* ===== Phase 25: テーブルの向かい＋配布方式 ===== */
   .tarot-scene { position: relative; border-radius: 14px; overflow: hidden; margin-top: 10px; box-shadow: 0 8px 22px rgba(90, 50, 110, .28); }
-  .tarot-scene img, .tarot-scene video { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; background: #2e1a35; }
+  .tarot-scene img, .tarot-scene video { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; object-position: center 30%; display: block; background: #2e1a35; }
+  /* ===== Phase 34: 自動スクロール時に上の固定メニューでミルの顔が隠れないようにする ===== */
+  #tarotScene, #tarotStage { scroll-margin-top: 104px; }
   .scene-chip { position: absolute; top: 8px; left: 8px; background: rgba(229, 107, 129, .94); color: #fff; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .04em; box-shadow: 0 2px 8px rgba(60, 20, 40, .35); }
   .table-stage { background: radial-gradient(ellipse at 50% 38%, #5b3a63, #2e1a35); border-radius: 14px; padding: 16px 8px 12px; margin-top: 10px; }
   .table-deck { text-align: center; color: #f2d38a; font-size: 13px; margin-bottom: 10px; }
