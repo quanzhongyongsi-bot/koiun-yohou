@@ -153,6 +153,27 @@
   .pile.r { animation: riffleR 1.05s ease-in-out infinite; opacity: .88; }
   @keyframes riffleL { 0%, 100% { transform: translateX(-52px) rotate(-7deg); } 50% { transform: translateX(-10px) rotate(0deg); } }
   @keyframes riffleR { 0%, 100% { transform: translateX(52px) rotate(7deg); } 50% { transform: translateX(10px) rotate(0deg); } }
+  /* ===== Phase 32: 自分で選ぶタロット＋ミルの大袈裟演出 ===== */
+  .tarot-scene.drama img, .tarot-scene.drama video { animation: sceneDrama .45s ease-in-out infinite alternate; }
+  @keyframes sceneDrama { from { transform: scale(1); } to { transform: scale(1.07) rotate(.6deg); } }
+  .riffle-wrap.big { height: 200px; }
+  .riffle-wrap.big .pile { width: 96px; height: 142px; margin-left: -48px; font-size: 36px; }
+  .riffle-wrap.big .pile.l { animation: riffleLBig .5s ease-in-out infinite; }
+  .riffle-wrap.big .pile.r { animation: riffleRBig .5s ease-in-out infinite; }
+  @keyframes riffleLBig { 0%, 100% { transform: translate(-64px, 6px) rotate(-13deg); } 50% { transform: translate(-6px, -14px) rotate(3deg); } }
+  @keyframes riffleRBig { 0%, 100% { transform: translate(64px, -10px) rotate(13deg); } 50% { transform: translate(6px, 10px) rotate(-3deg); } }
+  .shuffle-call { position: absolute; top: -4px; left: 0; right: 0; text-align: center; font-size: 21px; font-weight: 900; color: #ffd166; letter-spacing: .12em; text-shadow: 0 2px 10px rgba(0,0,0,.45); animation: callPop .5s ease-in-out infinite alternate; z-index: 3; }
+  @keyframes callPop { from { transform: scale(1) rotate(-1.5deg); } to { transform: scale(1.13) rotate(1.5deg); } }
+  .sparkle { position: absolute; pointer-events: none; animation: sparkleFloat 1.15s ease-out infinite; z-index: 2; }
+  @keyframes sparkleFloat { 0% { transform: translateY(10px) scale(.6) rotate(0deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-46px) scale(1.25) rotate(40deg); opacity: 0; } }
+  .pick-banner { text-align: center; color: #ffd166; font-size: 16.5px; font-weight: 900; letter-spacing: .05em; margin: 4px 0 10px; animation: callPop .6s ease-in-out infinite alternate; text-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  .spread-grid { display: grid; grid-template-columns: repeat(3, 74px); gap: 10px; justify-content: center; margin: 2px 0 6px; }
+  .spread-card { position: relative; height: 110px; border: none; border-radius: 10px; background: linear-gradient(135deg, #8e6cc8, #e56b9c); color: #fff; font-size: 27px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 12px rgba(140, 90, 160, .35); animation: spreadIn .5s ease backwards; transition: transform .18s, box-shadow .18s; padding: 0; }
+  .spread-card:hover, .spread-card:active { transform: translateY(-8px) scale(1.06) !important; box-shadow: 0 0 0 3px #ffd166, 0 14px 22px rgba(213, 150, 40, .4); }
+  @keyframes spreadIn { from { transform: translateY(26px) scale(.7); opacity: 0; } to { opacity: 1; } }
+  .chosen-pop { animation: chosenPop .7s ease; }
+  @keyframes chosenPop { 0% { transform: scale(.5) rotate(-14deg); opacity: 0; } 55% { transform: scale(1.22) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); } }
+  @media (prefers-reduced-motion: reduce) { .tarot-scene.drama img, .tarot-scene.drama video, .riffle-wrap.big .pile.l, .riffle-wrap.big .pile.r, .shuffle-call, .sparkle, .pick-banner, .spread-card, .chosen-pop { animation: none; } }
   .fan-wrap { position: relative; height: 198px; }
   .fan-card { position: absolute; left: 50%; bottom: 8px; width: 62px; height: 94px; margin-left: -31px; border-radius: 9px; background: linear-gradient(135deg, #8e6cc8, #e56b9c); color: #fff; font-size: 21px; display: flex; align-items: center; justify-content: center; transform-origin: 50% 135%; cursor: pointer; box-shadow: 0 4px 10px rgba(140, 90, 160, .30); }
   .fan-card.picked { box-shadow: 0 0 0 3px #ffd166, 0 10px 20px rgba(213, 150, 40, .35); z-index: 2; }
@@ -507,7 +528,7 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
     <div class="page-head"><span class="page-badge">🔮</span><span class="page-name">診断</span></div>
     <div class="card">
       <h2>タロット占い</h2>
-      <p class="small">占い師のミル（白猫）が、テーブルの向かいに座って1対1で占うタロットです。シャッフルも、カードを配るのも、開くのも、全部ミルがやります。結果は、その日の小さな一歩のヒントにしてください。</p>
+      <p class="small">占い師のミル（白猫）が、テーブルの向かいに座って1対1で占うタロットです。カードを選ぶのは、あなた自身。ミルが大シャッフルして広げたら、ピンとくる1枚をタップして選んでください。1枚ごとにシャッフルを挟んで3枚選ぶと、鑑定結果が出ます。結果は、その日の小さな一歩のヒントにしてください。</p>
       <div id="tellerNow"></div>
     </div>
     <div class="card">
@@ -4791,7 +4812,7 @@ var TAROT_TONE = [1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, -1, -1, 1, 0, 1, 
 var tarotState = null;
 function reduceMotion() { try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) { return false; } }
 var SESSION_LINES = {
-  cat: { greet: "いらっしゃい。今日はわたしが、あなたのためだけにカードを読みますにゃ。テーブルの向かいに座って、ゆっくりしていって。", shuffle: "聞きたいことを、心の中でそっと唱えてください。……うん、伝わってきましたにゃ。わたしがシャッフルします。", deal: "では、3枚配りますにゃ。1枚目は今の状況、2枚目は気をつけること、3枚目はアドバイス。開くのも全部わたしがやるから、見ていて。", reveal: "配り終わりました。では、1枚ずつ開いていきますにゃ。" }
+  cat: { greet: "いらっしゃい。今日は特別ですにゃ。カードを選ぶのは、あなた自身。わたしが大シャッフルして広げるから、ピンとくる1枚を、あなたの手で選んでくださいにゃ。", shuffle1: "まずは大シャッフル！ 聞きたいことを、心の中でそっと唱えて……カードよ、集まれ〜！ 全力で混ぜるにゃー！", pick1: "広げましたにゃ！ 1枚目、今の状況のカードです。直感を信じて、タップして選んで！", react1: "おっ、そのカードにゃ！ いい引きですにゃ！", shuffle2: "その調子！ 2枚目の前に、もう一度大シャッフルするにゃ！ まだまだ混ぜるにゃー！", pick2: "2枚目、気をつけることのカード。さあ、どれがあなたを呼んでいますか？", react2: "決まったにゃ！ なかなかの手つきですにゃ。", shuffle3: "あと1枚！ 最後の大シャッフルにゃー！ 気合いを入れて混ぜるにゃ！", pick3: "最後の1枚、アドバイスのカードです。運命の1枚、選んでにゃ！", react3: "3枚そろったにゃ！！", reveal: "いよいよ開きますにゃ！ ドキドキの瞬間……1枚ずつ、いくにゃ！" }
 };
 function sessionLine(key) { var L = SESSION_LINES.cat; return L ? (L[key] || "") : ""; }
 var typeTimer = null;
@@ -4804,7 +4825,7 @@ function typeSpeech(text) {
   typeTimer = setInterval(function () { i++; el.textContent = text.slice(0, i); if (i >= text.length) { clearInterval(typeTimer); typeTimer = null; } }, 26);
 }
 function finishType() { if (typeTimer) { clearInterval(typeTimer); typeTimer = null; } var el = document.getElementById("tarotSpeech"); if (el && tarotState) el.textContent = tarotState.speech || ""; }
-function stepDots(active) { var steps = ["あいさつ", "シャッフル", "配る", "開く", "読み解き"]; var html = '<div class="step-dots">'; for (var i = 0; i < steps.length; i++) html += '<span class="' + (i === active ? "on" : "") + '">' + steps[i] + "</span>"; return html + "</div>"; }
+function stepDots(active) { var steps = ["あいさつ", "1枚目を選ぶ", "シャッフル", "2・3枚目を選ぶ", "読み解き"]; var html = '<div class="step-dots">'; for (var i = 0; i < steps.length; i++) html += '<span class="' + (i === active ? "on" : "") + '">' + steps[i] + "</span>"; return html + "</div>"; }
 var sceneKey = "";
 function renderTarotScene() {
   var box = document.getElementById("tarotScene"); if (!box) return;
@@ -4813,83 +4834,137 @@ function renderTarotScene() {
   var key = phase + "|" + (reduceMotion() ? "rm" : "mv");
   if (key === sceneKey) return;
   sceneKey = key;
-  var status = phase === "idle" ? "タロット占い" : phase === "done" ? "読み解き完了" : phase === "greet" ? "対面セッション中" : phase === "shuffle" ? "シャッフル中" : phase === "deal" ? "カードを配っています" : "カードを開いています";
+  var status = phase === "idle" ? "タロット占い" : phase === "done" ? "読み解き完了" : phase === "greet" ? "対面セッション中" : phase === "shuffle" ? "ミルが大シャッフル中！" : phase === "pick" ? "カードを選んでいます" : phase === "picked" ? "カードが決まりました！" : "カードを開いています";
   var media = phase === "shuffle" && !reduceMotion()
     ? '<video src="' + t.tableVideo + '" poster="' + t.tableArt + '" autoplay muted loop playsinline aria-label="テーブルの向かいでタロットをシャッフルするミル"></video>'
     : '<img src="' + t.tableArt + '" alt="テーブルの向かいに座る白猫の占い師ミル">';
-  box.innerHTML = '<div class="tarot-scene">' + media + '<span class="scene-chip">' + status + '</span></div>';
+  box.innerHTML = '<div class="tarot-scene' + (phase === "shuffle" && !reduceMotion() ? " drama" : "") + '">' + media + '<span class="scene-chip">' + status + '</span></div>';
+}
+function sparklesHTML(n) {
+  var icons = ["✨", "⭐", "🌙", "💫", "✨", "⭐"];
+  var html = "";
+  for (var i = 0; i < n; i++) {
+    var left = 6 + ((i * 37) % 86);
+    var top = 8 + ((i * 23) % 55);
+    var size = 15 + ((i * 7) % 14);
+    html += '<span class="sparkle" style="left:' + left + '%;top:' + top + '%;font-size:' + size + 'px;animation-delay:' + (i * 0.14) + 's">' + icons[i % icons.length] + "</span>";
+  }
+  return html;
+}
+function slotsHTML(animIdx) {
+  var html = '<div class="deal-slots">';
+  for (var k = 0; k < 3; k++) {
+    html += '<div class="slot">';
+    if (tarotState && k < tarotState.dealt) {
+      var c = TAROT[tarotState.cards[k]];
+      var flipped = k < tarotState.revealed;
+      html += '<div class="tcard big' + (flipped ? " flipped" : "") + (k === animIdx ? " chosen-pop" : "") + '"><div class="tcard-inner"><div class="tcard-face tcard-back">🌙</div><div class="tcard-face tcard-front"><div style="font-size:34px">' + c[1] + '</div><div><b>' + c[0] + '</b></div><div class="small">' + TAROT_POS[k] + '</div></div></div></div>';
+    } else {
+      html += '<div class="slot-empty">🌙</div>';
+    }
+    html += '<div class="pos">' + TAROT_POS[k] + '</div></div>';
+  }
+  return html + '</div>';
 }
 function renderTableStage(animIdx) {
   var st = document.getElementById("tarotStage"); if (!st) return;
-  var active = !tarotState ? 0 : tarotState.phase === "greet" ? 0 : tarotState.phase === "shuffle" ? 1 : tarotState.phase === "deal" ? 2 : tarotState.done ? 4 : 3;
-  var html = '<div class="table-stage">';
+  var active = !tarotState ? 0 : tarotState.phase === "greet" ? 0 : tarotState.phase === "pick" && tarotState.dealt === 0 ? 1 : tarotState.phase === "shuffle" ? 2 : tarotState.done ? 4 : 3;
+  var html = '<div class="table-stage" style="position:relative">';
   if (!tarotState || tarotState.phase === "greet") {
     html += '<div class="table-deck">🃏 ミルのタロットデッキ</div><div class="deal-slots"><div class="slot"><div class="slot-empty">🌙</div><div class="pos">今の状況</div></div><div class="slot"><div class="slot-empty">🌙</div><div class="pos">気をつけること</div></div><div class="slot"><div class="slot-empty">🌙</div><div class="pos">アドバイス</div></div></div>';
   } else if (tarotState.phase === "shuffle") {
-    html += '<div class="riffle-wrap"><div class="pile r">🌙</div><div class="pile l">🌙</div><p class="text deck-msg" style="color:#f2d38a">シャッフル中…</p></div>';
-  } else {
-    html += '<div class="deal-slots">';
-    for (var k = 0; k < 3; k++) {
-      html += '<div class="slot">';
-      if (k < tarotState.dealt) {
-        var c = TAROT[tarotState.cards[k]];
-        var flipped = k < tarotState.revealed;
-        html += '<div class="tcard big' + (flipped ? " flipped" : "") + (k === animIdx ? " deal-in" : "") + '"><div class="tcard-inner"><div class="tcard-face tcard-back">🌙</div><div class="tcard-face tcard-front"><div style="font-size:34px">' + c[1] + '</div><div><b>' + c[0] + '</b></div><div class="small">' + TAROT_POS[k] + '</div></div></div></div>';
-      } else {
-        html += '<div class="slot-empty">🌙</div>';
-      }
-      html += '<div class="pos">' + TAROT_POS[k] + '</div></div>';
+    html += '<div class="riffle-wrap big"><div class="shuffle-call">シャッフル！シャッフル！</div>' + sparklesHTML(7) + '<div class="pile r">🌙</div><div class="pile l">🌙</div><p class="text deck-msg" style="color:#f2d38a">ミルが全力でシャッフル中…！</p></div>';
+  } else if (tarotState.phase === "pick") {
+    var n = tarotState.dealt + 1;
+    html += slotsHTML(-1);
+    html += '<div class="pick-banner">✋ ' + n + '枚目：' + TAROT_POS[tarotState.dealt] + 'のカードを選んで！</div>';
+    html += '<div class="spread-grid">';
+    for (var j = 0; j < tarotState.spread.length; j++) {
+      var rot = ((j * 29) % 9) - 4;
+      html += '<button type="button" class="spread-card" style="transform:rotate(' + rot + 'deg);animation-delay:' + (j * 0.06) + 's" onclick="pickCard(' + j + ')" aria-label="' + n + '枚目の候補カード">🌙</button>';
     }
     html += '</div>';
+  } else if (tarotState.phase === "picked") {
+    html += sparklesHTML(6) + slotsHTML(animIdx);
+  } else {
+    html += slotsHTML(-1);
   }
   html += "</div>" + stepDots(active);
   st.innerHTML = html;
 }
+// ===== Phase 32: 自分で選ぶタロット（選ぶ→大シャッフル→選ぶ→大シャッフル→選ぶ→結果） =====
+function shuffledDeck() {
+  var d = [];
+  for (var i = 0; i < TAROT.length; i++) d.push(i);
+  for (var i = d.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = d[i]; d[i] = d[j]; d[j] = tmp; }
+  return d;
+}
 function drawTarot() {
   if (tarotState && !tarotState.done) return;
   if (!canPlay("tarot")) { alert("今日のタロットは引き終わりました。プレミアムでは引き直せます"); return; }
-  var idx = [];
-  while (idx.length < 3) { var n = Math.floor(Math.random() * TAROT.length); if (idx.indexOf(n) < 0) idx.push(n); }
-  tarotState = { phase: "greet", cards: idx, dealt: 0, revealed: 0, done: false, lines: [], speech: "" };
+  tarotState = { phase: "greet", deck: shuffledDeck(), spread: [], cards: [], dealt: 0, revealed: 0, done: false, lines: [], speech: "", lock: false };
   sceneKey = ""; renderTarotScene();
   renderTableStage(-1);
-  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルが向かいに座りました。準備ができたら、次へ進んでください。</p>';
-  document.getElementById("tarotAction").innerHTML = '<button class="primary" onclick="tarotNext()">次へ（シャッフルしてもらう）</button>';
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルが向かいに座りました。今日は、カードを選ぶのはあなたです。</p>';
+  document.getElementById("tarotAction").innerHTML = '<button class="primary" onclick="tarotNext()">ミルにシャッフルしてもらう</button>';
   typeSpeech(sessionLine("greet"));
 }
 function tarotNext() {
   if (!tarotState || tarotState.phase !== "greet") return;
+  startShufflePhase(1);
+}
+function startShufflePhase(nextPick) {
   tarotState.phase = "shuffle";
+  tarotState.nextPick = nextPick;
   document.getElementById("tarotAction").innerHTML = "";
-  renderTarotScene();
+  sceneKey = ""; renderTarotScene();
   renderTableStage(-1);
-  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルがカードを切っています。聞きたいことを、心の中でそっと唱えてください。</p>';
-  typeSpeech(sessionLine("shuffle"));
-  later(startDeal, 3200);
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルが全力でカードを混ぜています。聞きたいことを、心の中でそっと唱えてください。</p>';
+  typeSpeech(sessionLine("shuffle" + nextPick));
+  later(startPick, reduceMotion() ? 500 : 3000);
 }
-function startDeal() {
+function startPick() {
   if (!tarotState || tarotState.phase !== "shuffle") return;
-  tarotState.phase = "deal";
-  renderTarotScene();
+  tarotState.deck = shuffledDeckFiltered();
+  tarotState.spread = tarotState.deck.slice(0, 9);
+  tarotState.phase = "pick";
+  sceneKey = ""; renderTarotScene();
   renderTableStage(-1);
-  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルがテーブルに、3枚のカードを配っています。</p>';
-  typeSpeech(sessionLine("deal"));
-  later(dealStep, 700);
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">ミルがカードを広げました。' + (tarotState.dealt + 1) + '枚目は「' + TAROT_POS[tarotState.dealt] + '」のカード。ピンとくる1枚をタップしてください。</p>';
+  typeSpeech(sessionLine("pick" + (tarotState.dealt + 1)));
 }
-function dealStep() {
-  if (!tarotState || tarotState.phase !== "deal") return;
-  var k = tarotState.dealt;
-  tarotState.dealt++;
-  renderTableStage(k);
-  if (tarotState.dealt >= 3) {
-    tarotState.phase = "reveal";
-    renderTarotScene();
-    typeSpeech(sessionLine("reveal"));
-    document.getElementById("tarotResult").innerHTML = '<p class="muted">3枚そろいました。ミルが1枚ずつ開いていきます。</p>';
-    later(revealStep, 1100);
-  } else {
-    later(dealStep, 800);
-  }
+function shuffledDeckFiltered() {
+  var d = shuffledDeck();
+  return d.filter(function (ci) { return tarotState.cards.indexOf(ci) < 0; });
+}
+function pickCard(j) {
+  if (!tarotState || tarotState.phase !== "pick" || tarotState.lock) return;
+  if (j < 0 || j >= tarotState.spread.length) return;
+  tarotState.lock = true;
+  var chosen = tarotState.spread[j];
+  tarotState.cards.push(chosen);
+  tarotState.dealt = tarotState.cards.length;
+  tarotState.phase = "picked";
+  sceneKey = ""; renderTarotScene();
+  renderTableStage(tarotState.dealt - 1);
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">' + tarotState.dealt + '枚目が決まりました。</p>';
+  typeSpeech(sessionLine("react" + tarotState.dealt));
+  burstIn(document.getElementById("tarotStage"));
+  later(afterPick, reduceMotion() ? 400 : 1500);
+}
+function afterPick() {
+  if (!tarotState || tarotState.phase !== "picked") return;
+  tarotState.lock = false;
+  if (tarotState.dealt >= 3) { startRevealPhase(); return; }
+  startShufflePhase(tarotState.dealt + 1);
+}
+function startRevealPhase() {
+  tarotState.phase = "reveal";
+  sceneKey = ""; renderTarotScene();
+  renderTableStage(-1);
+  typeSpeech(sessionLine("reveal"));
+  document.getElementById("tarotResult").innerHTML = '<p class="muted">3枚そろいました。ミルが1枚ずつ開いていきます。</p>';
+  later(revealStep, 1300);
 }
 function revealStep() {
   if (!tarotState || tarotState.phase !== "reveal") return;
