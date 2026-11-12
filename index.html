@@ -697,6 +697,20 @@ nav button.active .tabimg { border-top: 3px solid #111; border-bottom: 3px solid
       <p class="muted">生年月日・よく行く場所・気になる相手のこと・日々の記録・お金の記録（収入と支出）は、すべてこの端末の中だけに保存されます。外部のサーバーへ送信されることはありません。安心して、正直に入力してください。情報が具体的であるほど、あなたに合ったアドバイスになります。</p>
     </div>
     <div class="card">
+      <h2>アプリ情報</h2>
+      <p class="small" id="appInfoLine" onclick="ownerTap()">こい運予報 バージョン 2026.11.12</p>
+      <div id="ownerPanel" style="display:none; margin-top:10px">
+        <p class="small" id="ownerStatus"></p>
+        <label>合言葉</label>
+        <input type="password" id="ownerPass" autocomplete="off" placeholder="合言葉を入力">
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="primary" id="ownerActionBtn" onclick="ownerAction()">オーナーモードを開く</button>
+          <button class="ghost" id="ownerOffBtn" onclick="ownerOff()" style="display:none">オーナーモードを切る</button>
+        </div>
+        <p class="small" id="ownerMsg"></p>
+      </div>
+    </div>
+    <div class="card">
       <h2>お金の記録モード</h2>
       <p class="small">お金の記録（見える化）の使い方を選べます。切り替えても、これまでの記録は消えません。収入・支出の記録は、この端末の中だけに保存され、第三者が閲覧することは一切ありません。</p>
       <label>モード</label>
@@ -3781,7 +3795,49 @@ function saveSub(s) { saveObj(SUB_KEY, s); }
 function dateCmp(a, b) { var pa = String(a).split("-"), pb = String(b).split("-"); for (var i = 0; i < 3; i++) { var d = (parseInt(pa[i], 10) || 0) - (parseInt(pb[i], 10) || 0); if (d !== 0) return d; } return 0; }
 function addMonth(ds) { var p = String(ds).split("-"); var d = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)); d.setMonth(d.getMonth() + 1); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
 function fmtDate(ds) { if (!ds) return ""; var p = String(ds).split("-"); return p[0] + "年" + p[1] + "月" + p[2] + "日"; }
+// ===== Phase 36: オーナーモード（この端末だけ・合言葉で開く。お客様の端末では開かない） =====
+var OWNER_FLAG = "koiunOwnerMode", OWNER_HASH = "koiunOwnerHash";
+function isOwnerMode() { try { return localStorage.getItem(OWNER_FLAG) === "1"; } catch (e) { return false; } }
+function ownerHashOf(pw) {
+  var s = "koiun-owner:" + pw;
+  if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)).then(function (buf) {
+      var hex = ""; var b = new Uint8Array(buf); for (var i = 0; i < b.length; i++) hex += ("0" + b[i].toString(16)).slice(-2); return hex;
+    });
+  }
+  var h = 0; for (var i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
+  return Promise.resolve("x" + h);
+}
+var ownerTapCount = 0, ownerTapTimer = null;
+function ownerTap() {
+  ownerTapCount++;
+  if (ownerTapTimer) clearTimeout(ownerTapTimer);
+  ownerTapTimer = setTimeout(function () { ownerTapCount = 0; }, 2000);
+  if (ownerTapCount >= 5) { ownerTapCount = 0; var p = document.getElementById("ownerPanel"); if (p) { p.style.display = (p.style.display === "none" || !p.style.display) ? "block" : "none"; renderOwnerPanel(); } }
+}
+function renderOwnerPanel() {
+  var st = document.getElementById("ownerStatus"), btn = document.getElementById("ownerActionBtn"), off = document.getElementById("ownerOffBtn"), msg = document.getElementById("ownerMsg");
+  if (!st) return;
+  var has = false; try { has = !!localStorage.getItem(OWNER_HASH); } catch (e) {}
+  if (isOwnerMode()) { st.textContent = "オーナーモード中です。この端末では全ての機能が開いています。"; btn.style.display = "none"; off.style.display = ""; }
+  else { st.textContent = has ? "オーナーモードは切れています。合言葉を入れると開きます。" : "まだ合言葉が決まっていません。合言葉を決めると、この端末だけで全ての機能が開くようになります。"; btn.style.display = ""; btn.textContent = has ? "オーナーモードを開く" : "合言葉を決めて開く"; off.style.display = "none"; }
+  if (msg) msg.textContent = "";
+}
+function refreshPremiumUI() { try { renderTasks(); } catch (e) {} try { playNote("tarot"); } catch (e) {} }
+function ownerAction() {
+  var inp = document.getElementById("ownerPass"), msg = document.getElementById("ownerMsg");
+  var pw = inp ? inp.value : "";
+  if (!pw || pw.length < 4) { if (msg) msg.textContent = "合言葉は4文字以上で入れてください。"; return; }
+  ownerHashOf(pw).then(function (hex) {
+    var saved = null; try { saved = localStorage.getItem(OWNER_HASH); } catch (e) {}
+    if (!saved) { try { localStorage.setItem(OWNER_HASH, hex); localStorage.setItem(OWNER_FLAG, "1"); } catch (e) {} if (inp) inp.value = ""; renderOwnerPanel(); var m2 = document.getElementById("ownerMsg"); if (m2) m2.textContent = "合言葉を決めて、オーナーモードを開きました。"; refreshPremiumUI(); return; }
+    if (saved === hex) { try { localStorage.setItem(OWNER_FLAG, "1"); } catch (e) {} if (inp) inp.value = ""; renderOwnerPanel(); var m3 = document.getElementById("ownerMsg"); if (m3) m3.textContent = "オーナーモードを開きました。"; refreshPremiumUI(); }
+    else if (msg) msg.textContent = "合言葉が違います。";
+  });
+}
+function ownerOff() { try { localStorage.removeItem(OWNER_FLAG); } catch (e) {} renderOwnerPanel(); var msg = document.getElementById("ownerMsg"); if (msg) msg.textContent = "オーナーモードを切りました。お客様と同じ表示に戻ります。"; refreshPremiumUI(); }
 function premiumActive() {
+  if (isOwnerMode()) return true;
   var s = loadSub();
   if (!s.status || s.status === "free") return false;
   var tk = todayKey(), guard = 0;
