@@ -137,6 +137,8 @@
   .tarot-scene img, .tarot-scene video { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; object-position: center 30%; display: block; background: #2e1a35; }
   /* ===== Phase 34: 自動スクロール時に上の固定メニューでミルの顔が隠れないようにする ===== */
   #tarotScene, #tarotStage { scroll-margin-top: 104px; }
+  /* ===== Phase 35: カードを開く場面ではシーンを細くして、ミルとカードを同じ画面に収める ===== */
+  .tarot-scene.compact img, .tarot-scene.compact video { aspect-ratio: 21 / 9; object-position: center 26%; }
   .scene-chip { position: absolute; top: 8px; left: 8px; background: rgba(229, 107, 129, .94); color: #fff; border-radius: 999px; padding: 3px 11px; font-size: 11px; font-weight: 700; letter-spacing: .04em; box-shadow: 0 2px 8px rgba(60, 20, 40, .35); }
   .table-stage { background: radial-gradient(ellipse at 50% 38%, #5b3a63, #2e1a35); border-radius: 14px; padding: 16px 8px 12px; margin-top: 10px; }
   .table-deck { text-align: center; color: #f2d38a; font-size: 13px; margin-bottom: 10px; }
@@ -4842,7 +4844,7 @@ function renderTarotScene() {
   var media = phase === "shuffle" && !reduceMotion()
     ? '<video src="' + t.tableVideo + '" poster="' + t.tableArt + '" autoplay muted loop playsinline aria-label="テーブルの向かいでタロットをシャッフルするミル"></video>'
     : '<img src="' + t.tableArt + '" alt="テーブルの向かいに座る白猫の占い師ミル">';
-  box.innerHTML = '<div class="tarot-scene' + (phase === "shuffle" && !reduceMotion() ? " drama" : "") + '">' + media + '<span class="scene-chip">' + status + '</span></div>';
+  box.innerHTML = '<div class="tarot-scene' + (phase === "shuffle" && !reduceMotion() ? " drama" : "") + (phase === "reveal" ? " compact" : "") + '">' + media + '<span class="scene-chip">' + status + '</span></div>';
 }
 function sparklesHTML(n) {
   var icons = ["✨", "⭐", "🌙", "💫", "✨", "⭐"];
@@ -4971,7 +4973,7 @@ function startRevealPhase() {
   renderTableStage(-1);
   typeSpeech(sessionLine("reveal"));
   document.getElementById("tarotResult").innerHTML = '<p class="muted">3枚そろいました。ミルが1枚ずつ開いていきます。</p>';
-  focusTarotEl("tarotStage");
+  focusTarotEl("tarotScene");
   later(revealStep, 1300);
 }
 function revealStep() {
