@@ -1,5 +1,5 @@
 // 恋運予報 サービスワーカー: オンラインでは常に最新を取りに行き、オフラインの時だけキャッシュを使う
-const CACHE = 'koiun-v26';
+const CACHE = 'koiun-v27';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
